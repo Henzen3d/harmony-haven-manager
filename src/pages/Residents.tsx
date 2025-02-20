@@ -18,7 +18,7 @@ const Residents = () => {
           <SidebarTrigger />
           <div className="space-y-6 animate-fade-in">
             <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-semibold text-foreground">Residents</h1>
+              <h1 className="text-3xl font-semibold text-foreground">Condôminos</h1>
             </div>
 
             <Card className="p-6">
@@ -26,7 +26,7 @@ const Residents = () => {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
-                    placeholder="Search residents..."
+                    placeholder="Buscar condôminos..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
