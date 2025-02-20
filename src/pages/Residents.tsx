@@ -5,13 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Search, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import ResidentsList from "@/components/ResidentsList";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
@@ -28,20 +28,20 @@ const Residents = () => {
           <div className="space-y-6 animate-fade-in">
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-semibold text-foreground">Condôminos</h1>
-              <Sheet>
-                <SheetTrigger asChild>
+              <Dialog>
+                <DialogTrigger asChild>
                   <Button className="gap-2">
                     <UserPlus className="size-4" />
                     Novo Condômino
                   </Button>
-                </SheetTrigger>
-                <SheetContent className="sm:max-w-[500px]">
-                  <SheetHeader>
-                    <SheetTitle>Cadastrar Novo Condômino</SheetTitle>
-                    <SheetDescription>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Cadastrar Novo Condômino</DialogTitle>
+                    <DialogDescription>
                       Preencha os dados do novo condômino. Clique em salvar quando terminar.
-                    </SheetDescription>
-                  </SheetHeader>
+                    </DialogDescription>
+                  </DialogHeader>
                   <div className="mt-6 space-y-4">
                     <div className="space-y-2">
                       <label htmlFor="name" className="text-sm font-medium">
@@ -71,8 +71,8 @@ const Residents = () => {
                       Salvar Condômino
                     </Button>
                   </div>
-                </SheetContent>
-              </Sheet>
+                </DialogContent>
+              </Dialog>
             </div>
 
             <Card className="p-6">
