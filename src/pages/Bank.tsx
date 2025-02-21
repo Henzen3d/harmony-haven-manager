@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,7 +25,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { ptBR } from "date-fns";
+import { pt } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
@@ -36,39 +37,107 @@ const accountTypes = [
   "Cheque Compensado",
   "Cobrança de Energia",
   "Cobrança de Internet",
-  "Compra de Imóvel",
-  "Compra de Material",
-  "Compra de Terreno",
-  "Condomínio",
-  "Contas a Pagar",
-  "Contas a Receber",
-  "Correção Monetária Ativo",
-  "Correção Monetária Passivo",
-  "Custo de Construção",
-  "Empréstimo",
-  "Folha de Pagamento",
-  "Honorários Advocatícios",
-  "Imposto de Renda",
-  "Impostos e Taxas",
-  "Juros",
-  "Multas",
-  "Outras Despesas",
-  "Outras Receitas",
-  "Pagamento de Juros",
-  "Pagamento de Principal",
-  "Provisão de Devedores Duvidosos",
-  "Reembolso",
-  "Remuneração de Capital Próprio",
-  "Repasse de Aluguel",
-  "Resgate de Aplicação",
-  "Salários",
-  "Seguros",
-  "Serviços Contratados",
-  "Transferência Bancária",
-  "Venda de Ativo",
-  "Venda de Imóvel",
-  "Venda de Terreno",
-  "Venda de Unidade",
+  "Cobrança Segurança Condomínio",
+  "Cobrança Vaga de Garagem",
+  "Consertos Gerais",
+  "Consumo de Água",
+  "Consumo de Energia",
+  "Consumo de Gás",
+  "Desconto Concedido",
+  "Desconto Recebido",
+  "Despesas Bancárias",
+  "Estorno de Cheque Compensado",
+  "Estorno de Pagamento",
+  "Estorno de Recebimento",
+  "Fundo de Reserva",
+  "Jardinagem",
+  "Chaveiro",
+  "Outras Conservação e Limpeza",
+  "Outras Despesas Fixas",
+  "Outras Despesas Manutenção",
+  "Outros Encargos Sociais",
+  "Pagamento Água",
+  "Pagamento Limpeza Fossa",
+  "Pagamento Consertos Gerais",
+  "Pagamento Contribuição Confederativa",
+  "Pagamento Contribuição Sindical",
+  "Pagamento DARF",
+  "Pagamento de Água",
+  "Pagamento de Internet",
+  "Pagamento de Multa/Juro",
+  "Pagamento Encanador",
+  "Pagamento Esc. Contabilidade",
+  "Pagamento FGTS",
+  "Pagamento Gás",
+  "Pagamento INSS",
+  "Pagamento Jardineiro",
+  "Pagamento Remuneração Síndico",
+  "Pagamento Seguro Condomínio",
+  "Pagamento Sistema de Gestão",
+  "Pagamento Telefonia",
+  "Pagamento Título Antecipado",
+  "Pagamento Título Pago em Atraso",
+  "Pagamento Vigilância",
+  "Provisão Férias e 13 Salário",
+  "Rateio Ajuste de Saldo Débito",
+  "Rateio Cheque Compensado",
+  "Rateio Cobrança de Internet",
+  "Rateio Cobrança Segurança Condomínio",
+  "Rateio Consertos Gerais",
+  "Rateio Desconto Concedido",
+  "Rateio Despesas Bancárias",
+  "Rateio Estorno de Recebimento",
+  "Rateio Jardinagem",
+  "Rateio Chaveiro",
+  "Rateio Outras Conservação e Limpeza",
+  "Rateio Outras Despesas Fixas",
+  "Rateio Outras Despesas Manutenção",
+  "Rateio Outros Encargos Sociais",
+  "Rateio Pagamento Água",
+  "Rateio Pagamento Auto Fossa",
+  "Rateio Pagamento Consertos Gerais",
+  "Rateio Pagamento Contribuição Confederativa",
+  "Rateio Pagamento Contribuição Sindical",
+  "Rateio Pagamento DARF",
+  "Rateio Pagamento de Água",
+  "Rateio Pagamento de Internet",
+  "Rateio Pagamento de Multa/Juro",
+  "Rateio Pagamento Encanador",
+  "Rateio Pagamento Energia",
+  "Rateio Pagamento Esc. Contabilidade",
+  "Rateio Pagamento FGTS",
+  "Rateio Pagamento Gás",
+  "Rateio Pagamento INSS",
+  "Rateio Pagamento Jardineiro",
+  "Rateio Pagamento Remuneração Síndico",
+  "Rateio Pagamento Seguro Condomínio",
+  "Rateio Pagamento Sistema de Gestão",
+  "Rateio Pagamento Telefonia",
+  "Rateio Pagamento Vigilância",
+  "Rateio Provisão Férias e 13 Salário",
+  "Rateio Saldo Inicial Débito",
+  "Rateio Segurança Condomínio",
+  "Rateio Tarifa Bancária",
+  "Recebimento de Boleto",
+  "Recebimento de Boleto em Atraso",
+  "Recebimento de Boleto Pago Antecipado",
+  "Recebimento de Fatura de Cartão",
+  "Recebimento de Multa/Juro",
+  "Recebimento Índice",
+  "Saldo Inicial Crédito",
+  "Saldo Inicial Débito",
+  "Segurança Condomínio",
+  "Tarifa Bancária",
+  "Taxa de Acordo",
+  "Taxa de Mudança",
+  "Taxa de Uso de Área Comum",
+  "Taxa extra",
+  "Taxa Quadra de Tênis",
+  "Taxa Salão de Festas",
+  "Taxa Segunda Via Boleto",
+  "Transferência entre contas - entrada",
+  "Transferência entre contas - saida",
+  "Valor do Condominio"
 ];
 
 const Bank = () => {
@@ -134,7 +203,7 @@ const Bank = () => {
                             )}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {date ? format(date, "PPP", { locale: ptBR }) : "Selecione a data"}
+                            {date ? format(date, "PPP", { locale: pt }) : "Selecione a data"}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
@@ -234,7 +303,6 @@ const Bank = () => {
             </div>
 
             <Card className="p-6">
-              {/* Aqui você pode adicionar a tabela de movimentações bancárias */}
               <div className="text-center text-muted-foreground">
                 Nenhuma movimentação encontrada
               </div>
