@@ -1,7 +1,8 @@
 
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { User } from "lucide-react";
+import { User, Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Resident {
   id: number;
@@ -77,6 +78,16 @@ const ResidentsList = ({ searchTerm }: ResidentsListProps) => {
             <div className="flex-1">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">{resident.name}</h3>
+                <Button variant="ghost" size="icon" className="h-8 w-8" title="Editar">
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">Unit {resident.unit}</p>
+              <div className="mt-2 space-y-1">
+                <p className="text-sm">{resident.email}</p>
+                <p className="text-sm">{resident.phone}</p>
+              </div>
+              <div className="mt-3">
                 <span
                   className={`px-2 py-1 rounded-full text-xs ${
                     resident.status === "Active"
@@ -86,11 +97,6 @@ const ResidentsList = ({ searchTerm }: ResidentsListProps) => {
                 >
                   {resident.status}
                 </span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">Unit {resident.unit}</p>
-              <div className="mt-2 space-y-1">
-                <p className="text-sm">{resident.email}</p>
-                <p className="text-sm">{resident.phone}</p>
               </div>
             </div>
           </div>
