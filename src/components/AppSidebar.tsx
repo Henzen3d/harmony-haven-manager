@@ -1,4 +1,3 @@
-
 import {
   Home,
   Building2,
@@ -13,7 +12,6 @@ import {
   ArrowUpCircle,
   ArrowDownCircle,
   Receipt,
-  BanknotesIcon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
