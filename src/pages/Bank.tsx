@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,6 +28,7 @@ import { pt } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
+import { useToast } from "@/components/ui/use-toast";
 
 const accountTypes = [
   "Ajuste de Saldo Crédito",
@@ -141,21 +141,68 @@ const accountTypes = [
 ];
 
 const Bank = () => {
+  const { toast } = useToast();
   const [date, setDate] = useState<Date>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     accountType: "",
     description: "",
     value: "",
-    type: "credit", // credit or debit
+    type: "credit" as "credit" | "debit",
   });
 
-  const currentBalance = 1250.75; // Este valor viria do backend
+  const currentBalance = 1250.75;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    
+    if (!date) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione uma data",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.accountType) {
+      toast({
+        title: "Erro",
+        description: "Por favor, selecione uma conta contábil",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.value || parseFloat(formData.value) <= 0) {
+      toast({
+        title: "Erro",
+        description: "Por favor, insira um valor válido",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Aqui você enviaria os dados para o backend
+    console.log("Form submitted:", {
+      ...formData,
+      date,
+      value: parseFloat(formData.value),
+    });
+
+    toast({
+      title: "Sucesso",
+      description: "Movimentação bancária registrada com sucesso",
+    });
+
     setIsDialogOpen(false);
+    setFormData({
+      accountType: "",
+      description: "",
+      value: "",
+      type: "credit",
+    });
+    setDate(undefined);
   };
 
   return (
@@ -206,11 +253,12 @@ const Bank = () => {
                             {date ? format(date, "PPP", { locale: pt }) : "Selecione a data"}
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
+                        <PopoverContent className="w-auto p-0 bg-white">
                           <Calendar
                             mode="single"
                             selected={date}
                             onSelect={setDate}
+                            locale={pt}
                             initialFocus
                           />
                         </PopoverContent>
@@ -219,13 +267,18 @@ const Bank = () => {
 
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Conta Contábil</label>
-                      <Select>
+                      <Select
+                        value={formData.accountType}
+                        onValueChange={(value) =>
+                          setFormData({ ...formData, accountType: value })
+                        }
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione a conta contábil" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white">
                           {accountTypes.map((type) => (
-                            <SelectItem key={type} value={type}>
+                            <SelectItem key={type} value={type} className="cursor-pointer">
                               {type}
                             </SelectItem>
                           ))}
@@ -277,6 +330,7 @@ const Bank = () => {
                       <Input
                         type="number"
                         step="0.01"
+                        min="0"
                         value={formData.value}
                         onChange={(e) =>
                           setFormData({ ...formData, value: e.target.value })
