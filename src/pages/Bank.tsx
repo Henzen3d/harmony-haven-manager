@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Plus, Calendar as CalendarIcon } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,11 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -140,10 +134,20 @@ const accountTypes = [
   "Valor do Condominio"
 ];
 
+interface Transaction {
+  id: string;
+  date: string;
+  accountType: string;
+  description: string;
+  value: number;
+  type: "credit" | "debit";
+}
+
 const Bank = () => {
   const { toast } = useToast();
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [formData, setFormData] = useState({
     accountType: "",
     description: "",
@@ -151,7 +155,11 @@ const Bank = () => {
     type: "credit" as "credit" | "debit",
   });
 
-  const currentBalance = 1250.75;
+  const currentBalance = transactions.reduce((acc, transaction) => {
+    return transaction.type === "credit" 
+      ? acc + transaction.value 
+      : acc - transaction.value;
+  }, 1250.75);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,11 +191,16 @@ const Bank = () => {
       return;
     }
 
-    console.log("Form submitted:", {
-      ...formData,
+    const newTransaction: Transaction = {
+      id: crypto.randomUUID(),
       date,
+      accountType: formData.accountType,
+      description: formData.description,
       value: parseFloat(formData.value),
-    });
+      type: formData.type,
+    };
+
+    setTransactions(prev => [...prev, newTransaction]);
 
     toast({
       title: "Sucesso",
@@ -338,9 +351,45 @@ const Bank = () => {
             </div>
 
             <Card className="p-6">
-              <div className="text-center text-muted-foreground">
-                Nenhuma movimentação encontrada
-              </div>
+              {transactions.length === 0 ? (
+                <div className="text-center text-muted-foreground">
+                  Nenhuma movimentação encontrada
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="font-bold text-lg mb-4">
+                    Saldo Atual:{" "}
+                    <span className={cn(
+                      currentBalance >= 0 ? "text-green-600" : "text-red-600"
+                    )}>
+                      R$ {currentBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {transactions.map((transaction) => (
+                      <div
+                        key={transaction.id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                      >
+                        <div className="space-y-1">
+                          <div className="font-medium">{transaction.accountType}</div>
+                          <div className="text-sm text-gray-500">
+                            {format(new Date(transaction.date), "dd/MM/yyyy")}
+                            {transaction.description && ` - ${transaction.description}`}
+                          </div>
+                        </div>
+                        <div className={cn(
+                          "font-bold",
+                          transaction.type === "credit" ? "text-blue-600" : "text-red-600"
+                        )}>
+                          {transaction.type === "credit" ? "+" : "-"}
+                          R$ {transaction.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </Card>
           </div>
         </main>
