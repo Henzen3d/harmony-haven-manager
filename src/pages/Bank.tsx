@@ -183,7 +183,6 @@ const Bank = () => {
       return;
     }
 
-    // Aqui você enviaria os dados para o backend
     console.log("Form submitted:", {
       ...formData,
       date,
@@ -256,20 +255,24 @@ const Bank = () => {
                         <PopoverContent 
                           className="w-auto p-0" 
                           align="start"
+                          side="bottom"
+                          sideOffset={4}
                         >
-                          <Calendar
-                            mode="single"
-                            selected={date}
-                            onSelect={(newDate) => {
-                              setDate(newDate);
-                              const popoverTrigger = document.querySelector('[data-state="open"]');
-                              if (popoverTrigger) {
-                                (popoverTrigger as HTMLElement).click();
-                              }
-                            }}
-                            locale={pt}
-                            initialFocus
-                          />
+                          <div className="bg-white rounded-md shadow-lg">
+                            <Calendar
+                              mode="single"
+                              selected={date}
+                              onSelect={(newDate) => {
+                                setDate(newDate);
+                                const popoverTrigger = document.querySelector('[data-state="open"]');
+                                if (popoverTrigger) {
+                                  (popoverTrigger as HTMLElement).click();
+                                }
+                              }}
+                              locale={pt}
+                              initialFocus
+                            />
+                          </div>
                         </PopoverContent>
                       </Popover>
                     </div>
