@@ -142,7 +142,7 @@ const accountTypes = [
 
 const Bank = () => {
   const { toast } = useToast();
-  const [date, setDate] = useState<Date>();
+  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     accountType: "",
@@ -159,7 +159,7 @@ const Bank = () => {
     if (!date) {
       toast({
         title: "Erro",
-        description: "Por favor, selecione uma data",
+        description: "Por favor, insira uma data válida",
         variant: "destructive",
       });
       return;
@@ -201,7 +201,7 @@ const Bank = () => {
       value: "",
       type: "credit",
     });
-    setDate(undefined);
+    setDate(format(new Date(), 'yyyy-MM-dd'));
   };
 
   return (
@@ -239,42 +239,11 @@ const Bank = () => {
 
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Data</label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full justify-start text-left font-normal",
-                              !date && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {date ? format(date, "PPP", { locale: pt }) : "Selecione a data"}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent 
-                          className="w-auto p-0" 
-                          align="start"
-                          side="bottom"
-                          sideOffset={4}
-                        >
-                          <div className="bg-white rounded-md shadow-lg">
-                            <Calendar
-                              mode="single"
-                              selected={date}
-                              onSelect={(newDate) => {
-                                setDate(newDate);
-                                const popoverTrigger = document.querySelector('[data-state="open"]');
-                                if (popoverTrigger) {
-                                  (popoverTrigger as HTMLElement).click();
-                                }
-                              }}
-                              locale={pt}
-                              initialFocus
-                            />
-                          </div>
-                        </PopoverContent>
-                      </Popover>
+                      <Input
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                      />
                     </div>
 
                     <div className="space-y-2">
