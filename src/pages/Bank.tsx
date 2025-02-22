@@ -253,11 +253,20 @@ const Bank = () => {
                             {date ? format(date, "PPP", { locale: pt }) : "Selecione a data"}
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 bg-white">
+                        <PopoverContent 
+                          className="w-auto p-0" 
+                          align="start"
+                        >
                           <Calendar
                             mode="single"
                             selected={date}
-                            onSelect={setDate}
+                            onSelect={(newDate) => {
+                              setDate(newDate);
+                              const popoverTrigger = document.querySelector('[data-state="open"]');
+                              if (popoverTrigger) {
+                                (popoverTrigger as HTMLElement).click();
+                              }
+                            }}
                             locale={pt}
                             initialFocus
                           />
