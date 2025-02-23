@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
@@ -25,7 +26,18 @@ const Dashboard = () => {
       .lte('date', endDate.toISOString());
 
     if (!error && data) {
-      setTransactions(data);
+      // Map the database fields to our frontend Transaction type
+      const mappedTransactions = data.map(t => ({
+        id: t.id,
+        date: t.date,
+        accountType: t.account_type, // Map account_type to accountType
+        description: t.description,
+        value: t.value,
+        type: t.type as "credit" | "debit",
+        created_at: t.created_at,
+        updated_at: t.updated_at
+      }));
+      setTransactions(mappedTransactions);
     }
     setIsLoading(false);
   };

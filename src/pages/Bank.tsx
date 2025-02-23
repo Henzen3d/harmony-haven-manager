@@ -54,7 +54,19 @@ const Bank = () => {
       return;
     }
 
-    setTransactions(data || []);
+    // Map the database fields to our frontend Transaction type
+    const mappedTransactions = (data || []).map(t => ({
+      id: t.id,
+      date: t.date,
+      accountType: t.account_type, // Map account_type to accountType
+      description: t.description,
+      value: t.value,
+      type: t.type as "credit" | "debit",
+      created_at: t.created_at,
+      updated_at: t.updated_at
+    }));
+
+    setTransactions(mappedTransactions);
   };
 
   const handleSubmit = async (transactionData: Omit<Transaction, "id">) => {
@@ -63,7 +75,7 @@ const Bank = () => {
         .from('transactions')
         .update({
           date: transactionData.date,
-          account_type: transactionData.accountType,
+          account_type: transactionData.accountType, // Map accountType to account_type
           description: transactionData.description,
           value: transactionData.value,
           type: transactionData.type,
@@ -88,7 +100,7 @@ const Bank = () => {
         .from('transactions')
         .insert({
           date: transactionData.date,
-          account_type: transactionData.accountType,
+          account_type: transactionData.accountType, // Map accountType to account_type
           description: transactionData.description,
           value: transactionData.value,
           type: transactionData.type,
