@@ -1,10 +1,10 @@
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { Transaction } from "@/types/bank";
+import { cn } from "@/lib/utils";
 
 const Dashboard = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
