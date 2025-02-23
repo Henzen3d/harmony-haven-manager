@@ -17,6 +17,9 @@ import { TransactionsList } from "@/components/bank/TransactionsList";
 import { Transaction } from "@/types/bank";
 import { supabase } from "@/integrations/supabase/client";
 import { startOfMonth, endOfMonth } from "date-fns";
+import type { Database } from "@/integrations/supabase/types";
+
+type DbTransaction = Database['public']['Tables']['transactions']['Row'];
 
 const Bank = () => {
   const { toast } = useToast();
@@ -33,6 +36,17 @@ const Bank = () => {
   useEffect(() => {
     fetchTransactions();
   }, []);
+
+  const mapDbToTransaction = (dbTransaction: DbTransaction): Transaction => ({
+    id: dbTransaction.id,
+    date: dbTransaction.date,
+    accountType: dbTransaction.account_type,
+    description: dbTransaction.description,
+    value: dbTransaction.value,
+    type: dbTransaction.type as "credit" | "debit",
+    created_at: dbTransaction.created_at,
+    updated_at: dbTransaction.updated_at
+  });
 
   const fetchTransactions = async () => {
     const startDate = startOfMonth(new Date());
@@ -54,18 +68,7 @@ const Bank = () => {
       return;
     }
 
-    // Map the database fields to our frontend Transaction type
-    const mappedTransactions = (data || []).map(t => ({
-      id: t.id,
-      date: t.date,
-      accountType: t.account_type, // Map account_type to accountType
-      description: t.description,
-      value: t.value,
-      type: t.type as "credit" | "debit",
-      created_at: t.created_at,
-      updated_at: t.updated_at
-    }));
-
+    const mappedTransactions = (data || []).map(mapDbToTransaction);
     setTransactions(mappedTransactions);
   };
 
@@ -75,7 +78,7 @@ const Bank = () => {
         .from('transactions')
         .update({
           date: transactionData.date,
-          account_type: transactionData.accountType, // Map accountType to account_type
+          account_type: transactionData.accountType,
           description: transactionData.description,
           value: transactionData.value,
           type: transactionData.type,
@@ -100,7 +103,7 @@ const Bank = () => {
         .from('transactions')
         .insert({
           date: transactionData.date,
-          account_type: transactionData.accountType, // Map accountType to account_type
+          account_type: transactionData.accountType,
           description: transactionData.description,
           value: transactionData.value,
           type: transactionData.type,

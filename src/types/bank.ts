@@ -1,11 +1,17 @@
 
+import { Database } from "@/integrations/supabase/types";
+
+type TransactionRow = Database['public']['Tables']['transactions']['Row'];
+
 export interface Transaction {
   id: string;
   date: string;
   accountType: string;
-  description: string;
+  description: string | null;
   value: number;
   type: "credit" | "debit";
+  created_at: string;
+  updated_at: string;
 }
 
 export const accountTypes = [
