@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,10 @@ interface TransactionFormProps {
   onSubmit: (transaction: Omit<Transaction, "id">) => void;
   currentBalance: number;
   onCancel: () => void;
+  initialData?: Transaction | null;
 }
 
-export function TransactionForm({ onSubmit, currentBalance, onCancel }: TransactionFormProps) {
+export function TransactionForm({ onSubmit, currentBalance, onCancel, initialData }: TransactionFormProps) {
   const { toast } = useToast();
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [formData, setFormData] = useState({
@@ -29,6 +31,18 @@ export function TransactionForm({ onSubmit, currentBalance, onCancel }: Transact
     value: "",
     type: "credit" as "credit" | "debit",
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setDate(format(new Date(initialData.date), 'yyyy-MM-dd'));
+      setFormData({
+        accountType: initialData.accountType,
+        description: initialData.description,
+        value: initialData.value.toString(),
+        type: initialData.type,
+      });
+    }
+  }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
