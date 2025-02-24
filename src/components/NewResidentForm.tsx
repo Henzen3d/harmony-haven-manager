@@ -3,29 +3,92 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
 
 interface NewResidentFormProps {
   onClose: () => void;
+  initialData?: {
+    id: string;
+    name: string;
+    unit: string;
+    email: string | null;
+    phone: string;
+    status: "Active" | "Inactive";
+  };
 }
 
-const NewResidentForm = ({ onClose }: NewResidentFormProps) => {
+const NewResidentForm = ({ onClose, initialData }: NewResidentFormProps) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    name: "",
-    unit: "",
-    email: "",
-    phone: "",
+    name: initialData?.name || "",
+    unit: initialData?.unit || "",
+    email: initialData?.email || "",
+    phone: initialData?.phone || "",
+    status: initialData?.status || "Active" as const,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aqui você implementaria a lógica de salvar no backend
-    console.log("Salvando residente:", formData);
     
-    toast({
-      title: "Sucesso!",
-      description: "Condômino cadastrado com sucesso.",
-    });
+    if (initialData) {
+      // Update existing resident
+      const { error } = await supabase
+        .from('residents')
+        .update({
+          name: formData.name,
+          unit: formData.unit,
+          email: formData.email || null,
+          phone: formData.phone,
+          status: formData.status,
+        })
+        .eq('id', initialData.id);
+
+      if (error) {
+        toast({
+          title: "Erro",
+          description: "Erro ao atualizar condômino",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Sucesso",
+        description: "Condômino atualizado com sucesso",
+      });
+    } else {
+      // Create new resident
+      const { error } = await supabase
+        .from('residents')
+        .insert({
+          name: formData.name,
+          unit: formData.unit,
+          email: formData.email || null,
+          phone: formData.phone,
+          status: formData.status,
+        });
+
+      if (error) {
+        toast({
+          title: "Erro",
+          description: "Erro ao cadastrar condômino",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Sucesso",
+        description: "Condômino cadastrado com sucesso",
+      });
+    }
     
     onClose();
   };
@@ -77,7 +140,6 @@ const NewResidentForm = ({ onClose }: NewResidentFormProps) => {
           value={formData.email}
           onChange={handleChange}
           placeholder="Digite o email"
-          required
         />
       </div>
       <div className="space-y-2">
@@ -93,12 +155,31 @@ const NewResidentForm = ({ onClose }: NewResidentFormProps) => {
           required
         />
       </div>
+      <div className="space-y-2">
+        <label htmlFor="status" className="text-sm font-medium">
+          Status
+        </label>
+        <Select
+          value={formData.status}
+          onValueChange={(value: "Active" | "Inactive") =>
+            setFormData(prev => ({ ...prev, status: value }))
+          }
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Active">Ativo</SelectItem>
+            <SelectItem value="Inactive">Inativo</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <div className="flex justify-end gap-3 pt-4">
         <Button type="button" variant="outline" onClick={onClose}>
           Cancelar
         </Button>
         <Button type="submit">
-          Salvar Condômino
+          {initialData ? "Atualizar" : "Salvar"} Condômino
         </Button>
       </div>
     </form>

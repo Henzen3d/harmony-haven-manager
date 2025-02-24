@@ -17,9 +17,24 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
 import NewResidentForm from "@/components/NewResidentForm";
 
+interface Resident {
+  id: string;
+  name: string;
+  unit: string;
+  email: string | null;
+  phone: string;
+  status: "Active" | "Inactive";
+}
+
 const Residents = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingResident, setEditingResident] = useState<Resident | null>(null);
+
+  const handleEdit = (resident: Resident) => {
+    setEditingResident(resident);
+    setIsDialogOpen(true);
+  };
 
   return (
     <SidebarProvider>
@@ -30,7 +45,13 @@ const Residents = () => {
           <div className="space-y-6 animate-fade-in">
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-semibold text-foreground">Condôminos</h1>
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <Dialog 
+                open={isDialogOpen} 
+                onOpenChange={(open) => {
+                  setIsDialogOpen(open);
+                  if (!open) setEditingResident(null);
+                }}
+              >
                 <DialogTrigger asChild>
                   <Button className="gap-2">
                     <UserPlus className="size-4" />
@@ -39,12 +60,20 @@ const Residents = () => {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px]">
                   <DialogHeader>
-                    <DialogTitle>Cadastrar Novo Condômino</DialogTitle>
+                    <DialogTitle>
+                      {editingResident ? "Editar Condômino" : "Cadastrar Novo Condômino"}
+                    </DialogTitle>
                     <DialogDescription>
-                      Preencha os dados do novo condômino. Clique em salvar quando terminar.
+                      {editingResident 
+                        ? "Edite os dados do condômino. Clique em atualizar quando terminar."
+                        : "Preencha os dados do novo condômino. Clique em salvar quando terminar."
+                      }
                     </DialogDescription>
                   </DialogHeader>
-                  <NewResidentForm onClose={() => setIsDialogOpen(false)} />
+                  <NewResidentForm 
+                    onClose={() => setIsDialogOpen(false)} 
+                    initialData={editingResident}
+                  />
                 </DialogContent>
               </Dialog>
             </div>
@@ -61,7 +90,10 @@ const Residents = () => {
                   />
                 </div>
               </div>
-              <ResidentsList searchTerm={searchTerm} />
+              <ResidentsList 
+                searchTerm={searchTerm} 
+                onEdit={handleEdit}
+              />
             </Card>
           </div>
         </main>

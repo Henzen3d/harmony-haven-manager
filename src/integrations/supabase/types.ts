@@ -11,28 +11,34 @@ export type Database = {
     Tables: {
       residents: {
         Row: {
-          apartment_number: number | null
+          created_at: string
           email: string | null
           id: string
           name: string
-          phone: number
-          unit: number | null
+          phone: string
+          status: string
+          unit: string
+          updated_at: string
         }
         Insert: {
-          apartment_number?: number | null
+          created_at?: string
           email?: string | null
           id?: string
           name: string
-          phone: number
-          unit?: number | null
+          phone: string
+          status: string
+          unit: string
+          updated_at?: string
         }
         Update: {
-          apartment_number?: number | null
+          created_at?: string
           email?: string | null
           id?: string
           name?: string
-          phone?: number
-          unit?: number | null
+          phone?: string
+          status?: string
+          unit?: string
+          updated_at?: string
         }
         Relationships: []
       }
