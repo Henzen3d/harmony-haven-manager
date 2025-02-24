@@ -12,7 +12,7 @@ import {
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
 import { useToast } from "@/components/ui/use-toast";
-import { TransactionForm } from "@/components/bank/TransactionForm";
+import TransactionForm from "@/components/bank/TransactionForm";
 import { TransactionsList } from "@/components/bank/TransactionsList";
 import { Transaction } from "@/types/bank";
 import { supabase } from "@/integrations/supabase/client";
