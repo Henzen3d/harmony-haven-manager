@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,57 +10,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import { Transaction } from "@/types/bank";
 
 interface TransactionFormProps {
-  onClose: () => void;
+  onSubmit: (transactionData: Omit<Transaction, "id" | "created_at" | "updated_at">) => Promise<void>;
+  currentBalance: number;
+  onCancel: () => void;
+  initialData?: Transaction | null;
 }
 
-const TransactionForm = ({ onClose }: TransactionFormProps) => {
-  const { toast } = useToast();
+const TransactionForm = ({ onSubmit, currentBalance, onCancel, initialData }: TransactionFormProps) => {
   const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
-    accountType: "",
-    description: "",
-    value: "",
-    type: "credit" as "credit" | "debit",
+    date: initialData?.date || new Date().toISOString().split('T')[0],
+    accountType: initialData?.accountType || "",
+    description: initialData?.description || "",
+    value: initialData?.value.toString() || "",
+    type: initialData?.type || "credit" as "credit" | "debit",
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        date: initialData.date,
+        accountType: initialData.accountType,
+        description: initialData.description || "",
+        value: initialData.value.toString(),
+        type: initialData.type,
+      });
+    }
+  }, [initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const now = new Date().toISOString();
-    const transaction = {
+    await onSubmit({
       date: formData.date,
-      account_type: formData.accountType,
+      accountType: formData.accountType,
       description: formData.description,
       value: Number(formData.value),
       type: formData.type,
-      created_at: now,
-      updated_at: now,
-    };
-
-    const { error } = await supabase
-      .from("transactions")
-      .insert([transaction]);
-
-    if (error) {
-      toast({
-        title: "Erro",
-        description: "Erro ao cadastrar transação",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Sucesso",
-      description: "Transação cadastrada com sucesso",
     });
-
-    onClose();
   };
 
   return (
@@ -138,7 +127,7 @@ const TransactionForm = ({ onClose }: TransactionFormProps) => {
       </div>
 
       <div className="flex justify-end gap-3 pt-4">
-        <Button type="button" variant="outline" onClick={onClose}>
+        <Button type="button" variant="outline" onClick={onCancel}>
           Cancelar
         </Button>
         <Button type="submit">Salvar Transação</Button>
