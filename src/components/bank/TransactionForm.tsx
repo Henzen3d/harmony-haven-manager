@@ -1,8 +1,8 @@
 
-import { useState, useEffect } from "react";
-import { format } from "date-fns";
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -10,188 +10,141 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Transaction } from "@/types/bank";
-import { accountTypes } from "@/types/bank";
 
 interface TransactionFormProps {
-  onSubmit: (transaction: Omit<Transaction, "id">) => void;
-  currentBalance: number;
-  onCancel: () => void;
-  initialData?: Transaction | null;
+  onClose: () => void;
 }
 
-export function TransactionForm({ onSubmit, currentBalance, onCancel, initialData }: TransactionFormProps) {
+const TransactionForm = ({ onClose }: TransactionFormProps) => {
   const { toast } = useToast();
-  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [formData, setFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
     accountType: "",
     description: "",
     value: "",
     type: "credit" as "credit" | "debit",
   });
 
-  useEffect(() => {
-    if (initialData) {
-      setDate(format(new Date(initialData.date), 'yyyy-MM-dd'));
-      setFormData({
-        accountType: initialData.accountType,
-        description: initialData.description,
-        value: initialData.value.toString(),
-        type: initialData.type,
-      });
-    }
-  }, [initialData]);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!date) {
-      toast({
-        title: "Erro",
-        description: "Por favor, insira uma data válida",
-        variant: "destructive",
-      });
-      return;
-    }
 
-    if (!formData.accountType) {
-      toast({
-        title: "Erro",
-        description: "Por favor, selecione uma conta contábil",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!formData.value || parseFloat(formData.value) <= 0) {
-      toast({
-        title: "Erro",
-        description: "Por favor, insira um valor válido",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    onSubmit({
-      date,
-      accountType: formData.accountType,
+    const now = new Date().toISOString();
+    const transaction = {
+      date: formData.date,
+      account_type: formData.accountType,
       description: formData.description,
-      value: parseFloat(formData.value),
+      value: Number(formData.value),
       type: formData.type,
+      created_at: now,
+      updated_at: now,
+    };
+
+    const { error } = await supabase
+      .from("transactions")
+      .insert([transaction]);
+
+    if (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao cadastrar transação",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Sucesso",
+      description: "Transação cadastrada com sucesso",
     });
+
+    onClose();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <label className="text-sm font-medium">
-          Saldo Atual:{" "}
-          <span className={cn(
-            "font-bold",
-            currentBalance >= 0 ? "text-green-600" : "text-red-600"
-          )}>
-            R$ {currentBalance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </span>
-        </label>
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Data</label>
+        <Label htmlFor="date">Data</Label>
         <Input
+          id="date"
           type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
+          value={formData.date}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, date: e.target.value }))
+          }
+          required
         />
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Conta Contábil</label>
+        <Label htmlFor="type">Tipo</Label>
         <Select
-          value={formData.accountType}
-          onValueChange={(value) =>
-            setFormData({ ...formData, accountType: value })
+          value={formData.type}
+          onValueChange={(value: "credit" | "debit") =>
+            setFormData((prev) => ({ ...prev, type: value }))
           }
         >
           <SelectTrigger>
-            <SelectValue placeholder="Selecione a conta contábil" />
+            <SelectValue placeholder="Selecione o tipo" />
           </SelectTrigger>
-          <SelectContent className="bg-white">
-            {accountTypes.map((type) => (
-              <SelectItem key={type} value={type} className="cursor-pointer">
-                {type}
-              </SelectItem>
-            ))}
+          <SelectContent>
+            <SelectItem value="credit">Entrada</SelectItem>
+            <SelectItem value="debit">Saída</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Tipo de Grupo</label>
-        <div className="flex gap-4">
-          <Button
-            type="button"
-            variant={formData.type === "credit" ? "default" : "outline"}
-            className={cn(
-              "flex-1",
-              formData.type === "credit" && "font-bold text-blue-600"
-            )}
-            onClick={() => setFormData({ ...formData, type: "credit" })}
-          >
-            Crédito
-          </Button>
-          <Button
-            type="button"
-            variant={formData.type === "debit" ? "default" : "outline"}
-            className={cn(
-              "flex-1",
-              formData.type === "debit" && "font-bold text-red-600"
-            )}
-            onClick={() => setFormData({ ...formData, type: "debit" })}
-          >
-            Débito
-          </Button>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Descrição</label>
+        <Label htmlFor="accountType">Tipo de Conta</Label>
         <Input
-          value={formData.description}
+          id="accountType"
+          value={formData.accountType}
           onChange={(e) =>
-            setFormData({ ...formData, description: e.target.value })
+            setFormData((prev) => ({ ...prev, accountType: e.target.value }))
           }
-          placeholder="Digite a descrição"
+          placeholder="Ex: Conta Corrente"
+          required
         />
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium">Valor R$</label>
+        <Label htmlFor="description">Descrição</Label>
         <Input
+          id="description"
+          value={formData.description}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, description: e.target.value }))
+          }
+          placeholder="Ex: Pagamento de Energia"
+          required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="value">Valor</Label>
+        <Input
+          id="value"
           type="number"
           step="0.01"
-          min="0"
           value={formData.value}
           onChange={(e) =>
-            setFormData({ ...formData, value: e.target.value })
+            setFormData((prev) => ({ ...prev, value: e.target.value }))
           }
-          className={cn(
-            formData.type === "credit" ? "text-blue-600" : "text-red-600",
-            "font-bold"
-          )}
-          placeholder="0,00"
+          placeholder="0.00"
+          required
         />
       </div>
 
       <div className="flex justify-end gap-3 pt-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="outline" onClick={onClose}>
           Cancelar
         </Button>
-        <Button type="submit" className="bg-green-600 hover:bg-green-700">
-          Salvar
-        </Button>
+        <Button type="submit">Salvar Transação</Button>
       </div>
     </form>
   );
-}
+};
+
+export default TransactionForm;
