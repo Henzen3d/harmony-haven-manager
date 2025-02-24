@@ -50,11 +50,37 @@ const ResidentsList = ({ searchTerm, onEdit }: ResidentsListProps) => {
       return;
     }
 
-    setResidents(data || []);
+    // Ensure the status is of type "Active" | "Inactive"
+    const typedResidents = data?.map(resident => ({
+      ...resident,
+      status: resident.status as "Active" | "Inactive"
+    }));
+
+    setResidents(typedResidents || []);
   };
 
   useEffect(() => {
     fetchResidents();
+
+    // Subscribe to changes
+    const channel = supabase
+      .channel('schema-db-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'residents'
+        },
+        () => {
+          fetchResidents();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const handleDelete = async (resident: Resident) => {
@@ -78,7 +104,6 @@ const ResidentsList = ({ searchTerm, onEdit }: ResidentsListProps) => {
     });
     
     setResidentToDelete(null);
-    fetchResidents();
   };
 
   const filteredResidents = residents.filter((resident) =>

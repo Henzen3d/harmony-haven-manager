@@ -42,30 +42,6 @@ export type Database = {
         }
         Relationships: []
       }
-      residents_02: {
-        Row: {
-          email: string | null
-          id: string
-          name: string
-          phone: number
-          unit: number
-        }
-        Insert: {
-          email?: string | null
-          id?: string
-          name: string
-          phone: number
-          unit: number
-        }
-        Update: {
-          email?: string | null
-          id?: string
-          name?: string
-          phone?: number
-          unit?: number
-        }
-        Relationships: []
-      }
       residents_old: {
         Row: {
           created_at: string
