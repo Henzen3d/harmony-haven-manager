@@ -22,18 +22,18 @@ const Dashboard = () => {
     const { data, error } = await supabase
       .from('transactions')
       .select('*')
-      .gte('date', startDate.toISOString())
-      .lte('date', endDate.toISOString());
+      .gte('vencimento', startDate.toISOString())
+      .lte('vencimento', endDate.toISOString());
 
     if (!error && data) {
       // Map the database fields to our frontend Transaction type
       const mappedTransactions = data.map(t => ({
         id: t.id,
-        date: t.date,
-        accountType: t.account_type, // Map account_type to accountType
-        description: t.description,
-        value: t.value,
-        type: t.type as "credit" | "debit",
+        date: t.vencimento,
+        accountType: t.conta,
+        description: t.descricao,
+        value: t.valor,
+        type: t.tipo as "credit" | "debit",
         created_at: t.created_at,
         updated_at: t.updated_at
       }));

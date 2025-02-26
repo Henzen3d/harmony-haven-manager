@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Receipt } from "lucide-react";
@@ -6,7 +7,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
@@ -16,6 +16,7 @@ import { TransactionsList } from "@/components/bank/TransactionsList";
 import BillingGeneratorModal from "@/components/billing/BillingGeneratorModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { Transaction } from "@/types/bank";
 
 export default function Bank() {
   const [isNewTransactionOpen, setIsNewTransactionOpen] = useState(false);
@@ -34,9 +35,25 @@ export default function Bank() {
         throw new Error(error.message);
       }
 
-      return data;
+      // Map the database fields to our frontend Transaction type
+      return data?.map(t => ({
+        id: t.id,
+        date: t.vencimento,
+        accountType: t.conta,
+        description: t.descricao,
+        value: t.valor,
+        type: t.tipo as "credit" | "debit",
+        created_at: t.created_at,
+        updated_at: t.updated_at
+      })) || [];
     },
   });
+
+  const currentBalance = transactions?.reduce((acc, transaction) => {
+    return transaction.type === "credit" 
+      ? acc + transaction.value 
+      : acc - transaction.value;
+  }, 0) || 0;
 
   const handleCreateTransaction = async (values: any) => {
     try {
@@ -70,6 +87,34 @@ export default function Bank() {
     }
   };
 
+  const handleEditTransaction = (transaction: Transaction) => {
+    // Implementar edição
+    console.log("Edit transaction:", transaction);
+  };
+
+  const handleDeleteTransaction = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("transactions")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Sucesso!",
+        description: "Transação excluída com sucesso.",
+      });
+      refetchTransactions();
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro ao excluir transação. Tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -92,7 +137,12 @@ export default function Bank() {
             </div>
           </div>
 
-          <TransactionsList />
+          <TransactionsList 
+            transactions={transactions || []}
+            currentBalance={currentBalance}
+            onEdit={handleEditTransaction}
+            onDelete={handleDeleteTransaction}
+          />
 
           <Dialog open={isNewTransactionOpen} onOpenChange={setIsNewTransactionOpen}>
             <DialogContent>
@@ -102,7 +152,7 @@ export default function Bank() {
               <TransactionForm
                 onSubmit={handleCreateTransaction}
                 onCancel={() => setIsNewTransactionOpen(false)}
-                currentBalance={0}
+                currentBalance={currentBalance}
               />
             </DialogContent>
           </Dialog>

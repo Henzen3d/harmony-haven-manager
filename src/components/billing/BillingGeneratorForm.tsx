@@ -46,13 +46,18 @@ export default function BillingGeneratorForm({ onSuccess, onCancel }: BillingGen
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { error } = await supabase.from("billing_generations").insert([
-        {
-          ...formData,
-          reference_month: new Date(formData.reference_month + "-01"),
-          discount_value: formData.discount_value ? Number(formData.discount_value) : null,
-        },
-      ]);
+      // Remove the array wrapper and handle the date correctly
+      const { error } = await supabase.from("billing_generations").insert({
+        reference_month: new Date(formData.reference_month + "-01").toISOString(),
+        name: formData.name,
+        due_date: formData.due_date,
+        include_gas: formData.include_gas,
+        include_water: formData.include_water,
+        discount_date: formData.discount_date || null,
+        discount_type: formData.discount_type || null,
+        discount_value: formData.discount_value ? Number(formData.discount_value) : null,
+        status: 'draft'
+      });
 
       if (error) throw error;
 
