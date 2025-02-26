@@ -66,6 +66,112 @@ export type Database = {
         }
         Relationships: []
       }
+      billing_generations: {
+        Row: {
+          additional_message: string | null
+          balancete_end_date: string | null
+          balancete_start_date: string | null
+          created_at: string
+          discount_date: string | null
+          discount_type: string | null
+          discount_value: number | null
+          due_date: string
+          id: string
+          include_gas: boolean | null
+          include_water: boolean | null
+          name: string
+          reference_month: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          additional_message?: string | null
+          balancete_end_date?: string | null
+          balancete_start_date?: string | null
+          created_at?: string
+          discount_date?: string | null
+          discount_type?: string | null
+          discount_value?: number | null
+          due_date: string
+          id?: string
+          include_gas?: boolean | null
+          include_water?: boolean | null
+          name: string
+          reference_month: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          additional_message?: string | null
+          balancete_end_date?: string | null
+          balancete_start_date?: string | null
+          created_at?: string
+          discount_date?: string | null
+          discount_type?: string | null
+          discount_value?: number | null
+          due_date?: string
+          id?: string
+          include_gas?: boolean | null
+          include_water?: boolean | null
+          name?: string
+          reference_month?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      billing_items: {
+        Row: {
+          billing_generation_id: string | null
+          charge_id: string | null
+          created_at: string
+          id: string
+          unit_id: string | null
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          billing_generation_id?: string | null
+          charge_id?: string | null
+          created_at?: string
+          id?: string
+          unit_id?: string | null
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          billing_generation_id?: string | null
+          charge_id?: string | null
+          created_at?: string
+          id?: string
+          unit_id?: string | null
+          updated_at?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_items_billing_generation_id_fkey"
+            columns: ["billing_generation_id"]
+            isOneToOne: false
+            referencedRelation: "billing_generations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_items_charge_id_fkey"
+            columns: ["charge_id"]
+            isOneToOne: false
+            referencedRelation: "charges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_items_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       charge_units: {
         Row: {
           charge_id: string | null
