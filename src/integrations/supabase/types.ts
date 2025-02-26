@@ -9,6 +9,234 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      bancos: {
+        Row: {
+          codigo: string | null
+          ispb: string | null
+          nome_banco: string | null
+        }
+        Insert: {
+          codigo?: string | null
+          ispb?: string | null
+          nome_banco?: string | null
+        }
+        Update: {
+          codigo?: string | null
+          ispb?: string | null
+          nome_banco?: string | null
+        }
+        Relationships: []
+      }
+      bank_accounts: {
+        Row: {
+          agencia: string
+          bank_code: string
+          conta: string
+          created_at: string | null
+          id: string
+          saldo: number | null
+          taxa_administracao: number
+          tipo_conta: string
+          titular: string
+          updated_at: string | null
+        }
+        Insert: {
+          agencia: string
+          bank_code: string
+          conta: string
+          created_at?: string | null
+          id?: string
+          saldo?: number | null
+          taxa_administracao: number
+          tipo_conta: string
+          titular: string
+          updated_at?: string | null
+        }
+        Update: {
+          agencia?: string
+          bank_code?: string
+          conta?: string
+          created_at?: string | null
+          id?: string
+          saldo?: number | null
+          taxa_administracao?: number
+          tipo_conta?: string
+          titular?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      charge_units: {
+        Row: {
+          charge_id: string | null
+          created_at: string
+          id: string
+          status: string
+          unit_id: string | null
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          charge_id?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          unit_id?: string | null
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          charge_id?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          unit_id?: string | null
+          updated_at?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "charge_units_charge_id_fkey"
+            columns: ["charge_id"]
+            isOneToOne: false
+            referencedRelation: "charges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charge_units_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      charges: {
+        Row: {
+          created_at: string
+          description: string | null
+          document_urls: string[] | null
+          due_date: string
+          id: string
+          is_individual: boolean
+          name: string
+          periodicity: string
+          rateio_method: string | null
+          resident_id: string | null
+          status: string
+          total_value: number
+          type: string
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          document_urls?: string[] | null
+          due_date: string
+          id?: string
+          is_individual?: boolean
+          name: string
+          periodicity: string
+          rateio_method?: string | null
+          resident_id?: string | null
+          status?: string
+          total_value: number
+          type: string
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          document_urls?: string[] | null
+          due_date?: string
+          id?: string
+          is_individual?: boolean
+          name?: string
+          periodicity?: string
+          rateio_method?: string | null
+          resident_id?: string | null
+          status?: string
+          total_value?: number
+          type?: string
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "charges_resident_id_fkey"
+            columns: ["resident_id"]
+            isOneToOne: false
+            referencedRelation: "residents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "charges_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cobrancas: {
+        Row: {
+          created_at: string
+          data_vencimento: string
+          descricao: string | null
+          documentos: string[] | null
+          id: string
+          leitura: number | null
+          metodo_rateio: string | null
+          nome: string
+          periodicidade: string
+          status: string
+          tipo: string
+          tipo_cobranca: string
+          unidades: string[] | null
+          updated_at: string
+          valor_gas: number | null
+          valor_total: number
+        }
+        Insert: {
+          created_at?: string
+          data_vencimento: string
+          descricao?: string | null
+          documentos?: string[] | null
+          id?: string
+          leitura?: number | null
+          metodo_rateio?: string | null
+          nome: string
+          periodicidade: string
+          status?: string
+          tipo: string
+          tipo_cobranca: string
+          unidades?: string[] | null
+          updated_at?: string
+          valor_gas?: number | null
+          valor_total: number
+        }
+        Update: {
+          created_at?: string
+          data_vencimento?: string
+          descricao?: string | null
+          documentos?: string[] | null
+          id?: string
+          leitura?: number | null
+          metodo_rateio?: string | null
+          nome?: string
+          periodicidade?: string
+          status?: string
+          tipo?: string
+          tipo_cobranca?: string
+          unidades?: string[] | null
+          updated_at?: string
+          valor_gas?: number | null
+          valor_total?: number
+        }
+        Relationships: []
+      }
       residents: {
         Row: {
           created_at: string
@@ -59,34 +287,181 @@ export type Database = {
       }
       transactions: {
         Row: {
-          account_type: string
+          categoria: string
+          conta: string
           created_at: string
-          date: string
-          description: string | null
+          dataPagamento: string | null
+          desconto: number | null
+          descricao: string | null
+          fornecedor: string | null
           id: string
-          type: string
+          juros: number | null
+          liquidacao: string | null
+          multa: number | null
+          observacoes: string | null
+          referencia: string
+          tipo: string
+          unidade: string | null
           updated_at: string
+          valor: number
+          valorPago: number | null
+          vencimento: string
+        }
+        Insert: {
+          categoria: string
+          conta: string
+          created_at?: string
+          dataPagamento?: string | null
+          desconto?: number | null
+          descricao?: string | null
+          fornecedor?: string | null
+          id?: string
+          juros?: number | null
+          liquidacao?: string | null
+          multa?: number | null
+          observacoes?: string | null
+          referencia: string
+          tipo: string
+          unidade?: string | null
+          updated_at?: string
+          valor: number
+          valorPago?: number | null
+          vencimento: string
+        }
+        Update: {
+          categoria?: string
+          conta?: string
+          created_at?: string
+          dataPagamento?: string | null
+          desconto?: number | null
+          descricao?: string | null
+          fornecedor?: string | null
+          id?: string
+          juros?: number | null
+          liquidacao?: string | null
+          multa?: number | null
+          observacoes?: string | null
+          referencia?: string
+          tipo?: string
+          unidade?: string | null
+          updated_at?: string
+          valor?: number
+          valorPago?: number | null
+          vencimento?: string
+        }
+        Relationships: []
+      }
+      transactions_old: {
+        Row: {
+          account_type: string
+          categoria: string | null
+          conta: string | null
+          created_at: string
+          dataPagamento: string | null
+          date: string
+          desconto: number | null
+          descricao: string | null
+          description: string | null
+          fornecedor: string | null
+          id: string
+          juros: number | null
+          liquidacao: string | null
+          multa: number | null
+          observacoes: string | null
+          referencia: string | null
+          tipo: string | null
+          type: string
+          unit: string | null
+          updated_at: string
+          valor: number | null
+          valorPago: number | null
           value: number
+          vencimento: string | null
         }
         Insert: {
           account_type: string
+          categoria?: string | null
+          conta?: string | null
           created_at?: string
+          dataPagamento?: string | null
           date: string
+          desconto?: number | null
+          descricao?: string | null
           description?: string | null
+          fornecedor?: string | null
           id?: string
+          juros?: number | null
+          liquidacao?: string | null
+          multa?: number | null
+          observacoes?: string | null
+          referencia?: string | null
+          tipo?: string | null
           type: string
+          unit?: string | null
           updated_at?: string
+          valor?: number | null
+          valorPago?: number | null
           value: number
+          vencimento?: string | null
         }
         Update: {
           account_type?: string
+          categoria?: string | null
+          conta?: string | null
           created_at?: string
+          dataPagamento?: string | null
           date?: string
+          desconto?: number | null
+          descricao?: string | null
           description?: string | null
+          fornecedor?: string | null
           id?: string
+          juros?: number | null
+          liquidacao?: string | null
+          multa?: number | null
+          observacoes?: string | null
+          referencia?: string | null
+          tipo?: string | null
           type?: string
+          unit?: string | null
           updated_at?: string
+          valor?: number | null
+          valorPago?: number | null
           value?: number
+          vencimento?: string | null
+        }
+        Relationships: []
+      }
+      units: {
+        Row: {
+          area: number | null
+          block: string | null
+          created_at: string
+          floor: number | null
+          id: string
+          number: number
+          percentage: number | null
+          updated_at: string
+        }
+        Insert: {
+          area?: number | null
+          block?: string | null
+          created_at?: string
+          floor?: number | null
+          id?: string
+          number: number
+          percentage?: number | null
+          updated_at?: string
+        }
+        Update: {
+          area?: number | null
+          block?: string | null
+          created_at?: string
+          floor?: number | null
+          id?: string
+          number?: number
+          percentage?: number | null
+          updated_at?: string
         }
         Relationships: []
       }
